@@ -1,0 +1,9 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="item_margin_TopBottom">10dp</dimen>
+    <dimen name="card_margin_LeftRight">10dp</dimen>
+    <dimen name="item_margin_LeftRight">20dp</dimen>
+
+    <dimen name="normal_text_size">20dp</dimen>
+
+</resources>
