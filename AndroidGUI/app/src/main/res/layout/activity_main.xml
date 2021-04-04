@@ -300,7 +300,7 @@
                 android:textColor="@color/Black"/>
 
             <TextView
-                android:id="@+id/tv_quality"
+                android:id="@+id/tv_quantity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/item_margin_LeftRight"
@@ -308,17 +308,17 @@
                 android:layout_marginBottom="@dimen/item_margin_TopBottom"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/tv_duration"
-                android:text="Quality : "
+                android:text="Quantity : "
                 android:textSize="@dimen/normal_text_size"
                 android:textColor="@color/Black"/>
 
             <TextView
-                android:id="@+id/tv_quality_value"
+                android:id="@+id/tv_quantity_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/bt_water"
                 android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:layout_alignBaseline="@+id/tv_quality"
+                android:layout_alignBaseline="@+id/tv_quantity"
                 android:text="10 ml"
                 android:textSize="@dimen/normal_text_size"
                 android:textColor="@color/Black"/>
@@ -335,7 +335,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="20dp"
-                android:layout_alignBottom="@+id/tv_quality" />
+                android:layout_alignBottom="@+id/tv_quantity" />
 
         </RelativeLayout>
 

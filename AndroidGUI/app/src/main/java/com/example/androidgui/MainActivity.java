@@ -9,26 +9,26 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
-    private final static String TAG = "MainActivity";
-    private TextView tv_humidity_value;
-    private TextView tv_temperature_value;
-    private TextView tv_moisture_value;
-    private TextView tv_light_value;
-    private TextView tv_quality_value;
-    private TextView tv_duration_value;
-    private Button bt_water;
-    private Switch sw_auto_irrigation;
+    private final static String TAG = "MainActivity"; // TAG of this activity
+    private TextView tv_humidity_value; // air humidity Textview
+    private TextView tv_temperature_value; // Temperature Textview
+    private TextView tv_moisture_value; // soil moisture Textview
+    private TextView tv_light_value; // Light intensity Textview
+    private TextView tv_quantity_value; // water quantity  Textview
+    private TextView tv_duration_value; // water duration Textview
+    private Button bt_water; // button used to open and close pump
+    private Switch sw_auto_irrigation; // auto irrigation switch button
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        // find all components here
         tv_humidity_value = findViewById(R.id.tv_humidity_value);
         tv_temperature_value = findViewById(R.id.tv_temperature_value);
         tv_moisture_value = findViewById(R.id.tv_moisture_value);
         tv_light_value = findViewById(R.id.tv_light_value);
-        tv_quality_value = findViewById(R.id.tv_quality_value);
+        tv_quantity_value = findViewById(R.id.tv_quantity_value);
         tv_duration_value = findViewById(R.id.tv_duration_value);
         bt_water = findViewById(R.id.bt_water);
         sw_auto_irrigation = findViewById(R.id.sw_auto_irrigation);
@@ -38,16 +38,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         LoadData();
-
+        //  initialize all components here
         tv_humidity_value.setText(String.valueOf(MainApplication.getInstance().data.humidity));
         tv_temperature_value.setText(String.valueOf(MainApplication.getInstance().data.temperature));
         tv_moisture_value.setText(String.valueOf(MainApplication.getInstance().data.moisture));
         tv_light_value.setText(String.valueOf(MainApplication.getInstance().data.light));
-        tv_quality_value.setText("0 ml");
+        tv_quantity_value.setText("0 ml");
         tv_duration_value.setText("0 s");
-        bt_water.setOnClickListener(this);
-        sw_auto_irrigation.setOnCheckedChangeListener(this);
-
+        bt_water.setOnClickListener(this); // add  click listener
+        sw_auto_irrigation.setOnCheckedChangeListener(this); // add checked changed listener
     }
 
     private void LoadData(){
@@ -69,13 +68,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ((Button)v).setText("Stop");
                 //open pump
 
-                // refresh quality and duration
+                // refresh quantity and duration
 
             }else if (((Button)v).getText().equals("Stop")){
                 ((Button)v).setText("Water!");
                 //close pump
 
-                // refresh quality and duration
+                // refresh quantity and duration
 
             }
         }
