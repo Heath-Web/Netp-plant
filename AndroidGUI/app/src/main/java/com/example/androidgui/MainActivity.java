@@ -2,13 +2,19 @@ package com.example.androidgui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
+public class MainActivity extends AppCompatActivity  implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     private final static String TAG = "MainActivity"; // TAG of this activity
     private TextView tv_humidity_value; // air humidity Textview
     private TextView tv_temperature_value; // Temperature Textview
@@ -18,6 +24,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tv_duration_value; // water duration Textview
     private Button bt_water; // button used to open and close pump
     private Switch sw_auto_irrigation; // auto irrigation switch button
+
+    private String serverip = "10.0.2.2";
+    private int serverport = 8800;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +46,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        LoadData();
+
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                //Request environment data
+                sendRequest("get environment",serverip,serverport);
+
+                //set value
+                MainApplication.getInstance().data.humidity = Float.valueOf(10);
+                MainApplication.getInstance().data.moisture = Float.valueOf(10);
+                MainApplication.getInstance().data.light = Float.valueOf(10);
+                MainApplication.getInstance().data.temperature = Float.valueOf(10);
+            }
+        }).start();
+
         //  initialize all components here
         tv_humidity_value.setText(String.valueOf(MainApplication.getInstance().data.humidity));
         tv_temperature_value.setText(String.valueOf(MainApplication.getInstance().data.temperature));
@@ -49,16 +72,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sw_auto_irrigation.setOnCheckedChangeListener(this); // add checked changed listener
     }
 
-    private void LoadData(){
-        //recieve data from  Pi here through UDP
+    private String sendRequest(String request,String ip, int port){
+        /*
+         * This function is used to send a UDP request and receive response
+         */
+        String reply = null;
+        try {
 
+            // Define the address of the server
+            InetAddress address = InetAddress.getByName(ip);
+            byte[] data = request.getBytes();
+            // Create a datagram that contains the data information to be sent
+            DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+            //Instantiate UDP socket
+            DatagramSocket socket = new DatagramSocket();
+            // send datagram to server
+            socket.send(packet);
+            Log.d(TAG,"--sendRequest " + "Request \"" + request + "\" send to " + ip + ":" + port);
 
-        //set value
-        MainApplication.getInstance().data.humidity = Float.valueOf(10);
-        MainApplication.getInstance().data.moisture = Float.valueOf(10);
-        MainApplication.getInstance().data.light = Float.valueOf(10);
-        MainApplication.getInstance().data.temperature = Float.valueOf(10);
-
+            // Create a datagram to receive data from server
+            byte[] data2 = new byte[1024];
+            DatagramPacket packet2 = new DatagramPacket(data2, data2.length);
+            // receive the response from server
+            socket.receive(packet2);
+            // read data
+            reply = new String(data2, 0, packet2.getLength());
+            Log.d(TAG,"--sendRequest " + "Receive response \"" + reply + "\" from " + ip + ":" + port);
+            //close socket
+            socket.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return reply;
     }
 
     @Override
@@ -66,13 +111,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (v.getId() == R.id.bt_water){
             if (((Button)v).getText().equals("Water!")){
                 ((Button)v).setText("Stop");
+                Log.d(TAG,"Click on Water!");
                 //open pump
+                new  Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        sendRequest("open pump",serverip,serverport);
+                    }
+                }).start();
 
                 // refresh quantity and duration
 
             }else if (((Button)v).getText().equals("Stop")){
                 ((Button)v).setText("Water!");
+                Log.d(TAG,"Click on Stop");
                 //close pump
+                //open pump
+                new  Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        sendRequest("close pump",serverip,serverport);
+                    }
+                }).start();
 
                 // refresh quantity and duration
 
@@ -83,5 +143,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         // auto
+        Log.d(TAG,"Switch button checked changed");
     }
 }
