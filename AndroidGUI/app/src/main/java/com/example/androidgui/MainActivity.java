@@ -14,6 +14,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import com.google.gson.Gson;
+
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     private final static String TAG = "MainActivity"; // TAG of this activity
     private TextView tv_humidity_value; // air humidity Textview
@@ -25,8 +27,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     private Button bt_water; // button used to open and close pump
     private Switch sw_auto_irrigation; // auto irrigation switch button
 
-    private String serverip = "10.0.2.2";
-    private int serverport = 8800;
+    private String serverip = "10.0.2.2"; //server ip address
+    private int serverport = 8800; // server port number
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,11 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         tv_duration_value = findViewById(R.id.tv_duration_value);
         bt_water = findViewById(R.id.bt_water);
         sw_auto_irrigation = findViewById(R.id.sw_auto_irrigation);
+        //  initialize all global value
+        MainApplication.getInstance().data.humidity = (float) 0;
+        MainApplication.getInstance().data.moisture = (float) 0;
+        MainApplication.getInstance().data.light = (float) 0;
+        MainApplication.getInstance().data.temperature = (float) 0;
     }
 
     @Override
@@ -51,13 +58,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             @Override
             public void run() {
                 //Request environment data
-                sendRequest("get environment",serverip,serverport);
-
-                //set value
-                MainApplication.getInstance().data.humidity = Float.valueOf(10);
-                MainApplication.getInstance().data.moisture = Float.valueOf(10);
-                MainApplication.getInstance().data.light = Float.valueOf(10);
-                MainApplication.getInstance().data.temperature = Float.valueOf(10);
+                String res = sendRequest("get environment",serverip,serverport);
+                update_environmentData(res);
             }
         }).start();
 
@@ -70,6 +72,20 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         tv_duration_value.setText("0 s");
         bt_water.setOnClickListener(this); // add  click listener
         sw_auto_irrigation.setOnCheckedChangeListener(this); // add checked changed listener
+    }
+
+    private void update_environmentData(String env_str){
+        try{
+            //  update global value
+            MainApplication.getInstance().data = new Gson().fromJson(env_str,MainApplication.Data.class);
+            //update components
+            tv_humidity_value.setText(String.valueOf(MainApplication.getInstance().data.humidity));
+            tv_temperature_value.setText(String.valueOf(MainApplication.getInstance().data.temperature));
+            tv_moisture_value.setText(String.valueOf(MainApplication.getInstance().data.moisture));
+            tv_light_value.setText(String.valueOf(MainApplication.getInstance().data.light));
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private String sendRequest(String request,String ip, int port){
@@ -116,7 +132,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 new  Thread(new Runnable() {
                     @Override
                     public void run() {
-                        sendRequest("open pump",serverip,serverport);
+                        String res = sendRequest("open pump",serverip,serverport);
+
                     }
                 }).start();
 
