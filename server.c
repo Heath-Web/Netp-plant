@@ -24,7 +24,7 @@ int main(){
 	 *  recieve request from server and send response back
 	 */
 	//start server
-	int socket_fd = startServer();
+	int sock_fd = startServer();
 	
 	//initialize some global variables 	
 	char data[5] = ""; // used to acquire humidity and temperarure
@@ -102,7 +102,7 @@ int startServer(){
 	}
 	
 	// return socket file descriptor
-	return sock_fd
+	return sock_fd;
 } 
 
 char* generate_response(char recv_buf[], char data[]){
@@ -119,10 +119,10 @@ char* generate_response(char recv_buf[], char data[]){
 		// "get enviroment" command 
 		printf("#command: get enviroment \n");
 		//initialize variables
-		char *humidity_str = "0"; // humidity string format
-		char *temperature_str = "0"; // temperature string format
-		char *moisture_str = "0"; // moisture string format
-		char *light_str = "0"; // light String format
+		char humidity_str[] = "0"; // humidity string format
+		char temperature_str[] = "0"; // temperature string format
+		char moisture_str[] = "0"; // moisture string format
+		char light_str[] = "0"; // light String format
 		//get humidity adnd temperature
 		read_dht11_data(data); // pre load
 		int code = read_dht11_data(data);
@@ -139,10 +139,10 @@ char* generate_response(char recv_buf[], char data[]){
 				printf("light:%d\n",light);
 				
 				//Converts integers to string
-				itoa(data[0],humidity_str,10); 
-				itoa(data[2],temperature_str,10);
-				itoa(moisture,moisture_str,10);
-				itoa(light,light_str,10);
+				sprintf(humidity_str,"%d",data[0]); 
+				sprintf(temperature_str,"%d",data[2]); 
+				sprintf(moisture_str,"%d",moisture);
+				sprintf(light_str,"%d",light);
 				
 				//response (josn format) status code=1
 				strcpy(send_buf,"{\'status\':1,\'humidity\':");
