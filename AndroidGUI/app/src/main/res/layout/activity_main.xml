@@ -30,6 +30,7 @@
                 android:textColor="@color/Black"/>
 
             <TextView
+                android:id="@+id/tv_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/item_margin_TopBottom"
@@ -39,6 +40,15 @@
                 android:text="value"
                 android:textSize="@dimen/normal_text_size"
                 android:textColor="@color/Black"/>
+
+            <ImageButton
+                android:id="@+id/bt_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/abc_vector_test"
+                android:layout_toLeftOf="@+id/tv_value"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"/>
 
         </RelativeLayout>
 

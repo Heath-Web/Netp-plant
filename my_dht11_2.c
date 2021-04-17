@@ -4,7 +4,7 @@
 #include <time.h>
 #include <wiringPi.h>
 #include <string.h>
-#define DAT    4    //wiringPi mode
+#define DAT 2    //wiringPi mode
 void dht11_init(void)
 {
    pinMode(DAT,OUTPUT);
@@ -106,7 +106,7 @@ int read_dht11_data(char *data)
            return 3;//no respond
       }
 }
-int main()
+/*int main()
 {
    char data[5]="";
    if(wiringPiSetup()<0)
@@ -137,7 +137,7 @@ int main()
         sleep(2);
    }
    return 0;
-}
+}*/
 
 
 
