@@ -112,8 +112,11 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     }
 
     private udp_response sendRequest(String request,String ip, int port){
+
         /*
          * This function is used to send a UDP request and receive response
+         * Input : String request :
+         *         String Ip
          */
         String str_reply = null;
         udp_response response = new udp_response();
