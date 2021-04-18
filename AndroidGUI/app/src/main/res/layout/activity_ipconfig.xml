@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White"
+    tools:context=".IPconfigActivity">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/card_margin_LeftRight"
+        android:layout_marginEnd="@dimen/card_margin_LeftRight"
+        android:layout_marginTop="@dimen/item_margin_TopBottom"
+        android:paddingTop="@dimen/item_margin_TopBottom"
+>
+
+        <TextView
+            android:id="@+id/tv_IP_address_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/item_margin_TopBottom"
+            android:layout_marginBottom="@dimen/item_margin_TopBottom"
+            android:text="Please enter IP address of Raspberry Pi: "
+            android:textColor="@color/Black"
+            android:textSize="20dp"/>
+
+        <EditText
+            android:id="@+id/et_IP_ADDRESS"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/item_margin_TopBottom"
+            android:layout_marginBottom="@dimen/item_margin_TopBottom"
+            android:layout_below="@+id/tv_IP_address_hint"
+            android:text="@string/Pi_IPADDR"/>
+
+        <Button
+            android:id="@+id/bt_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_IP_ADDRESS"
+            android:layout_marginTop="@dimen/item_margin_TopBottom"
+            android:layout_marginBottom="@dimen/item_margin_TopBottom"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:text="Confirm"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

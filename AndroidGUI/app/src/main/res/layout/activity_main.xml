@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_autorenew"
+        android:layout_marginStart="@dimen/card_margin_LeftRight"
+        android:layout_marginEnd="@dimen/card_margin_LeftRight"
+        android:layout_above="@+id/ll_environmentData"/>
+
     <LinearLayout
+        android:id="@+id/ll_environmentData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@color/White"
+        android:layout_above="@+id/ll_irrigation"
         android:layout_margin="10dp"
         android:elevation="1dp">
 
@@ -45,10 +54,11 @@
                 android:id="@+id/bt_refresh"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/abc_vector_test"
+                android:background="@color/None"
+                android:src="@drawable/ic_autorenew"
                 android:layout_toLeftOf="@+id/tv_value"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"/>
+                android:layout_marginRight="16dp"/>
 
         </RelativeLayout>
 
@@ -173,69 +183,13 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tv_5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:text="others ："
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <TextView
-                android:id="@+id/tv_5_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:text="100"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tv_6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:text="others ："
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <TextView
-                android:id="@+id/tv_6_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:text="100"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-        </RelativeLayout>
-
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_irrigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:orientation="vertical"
         android:background="@color/White"
         android:layout_margin="10dp"
@@ -335,7 +289,7 @@
 
             <Button
                 android:id="@+id/bt_water"
-                android:layout_width="wrap_content"
+                android:layout_width="133dp"
                 android:layout_height="wrap_content"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:text="Water!"
@@ -352,4 +306,4 @@
     </LinearLayout>
 
 
-</LinearLayout>
+</RelativeLayout>

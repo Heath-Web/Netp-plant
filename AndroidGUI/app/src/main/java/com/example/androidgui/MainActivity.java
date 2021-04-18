@@ -1,7 +1,14 @@
 package com.example.androidgui;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +24,11 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import com.google.gson.Gson;
+
+import java.sql.Time;
+import java.text.DecimalFormat;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +44,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     private Switch sw_auto_irrigation; // auto irrigation switch button
     private ImageButton bt_refresh; //button used to update environment data
 
-    private String serverip = "192.168.101.36"; //server ip address
+    private String serverip ; //server ip address
     private int serverport = 8000; // server port number
 
     private final int SUCCEED = 1; // return status code 1 success
@@ -92,6 +104,10 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 }
             }
         }).start();
+
+        // get server  ip address
+        Intent intent = getIntent();
+        serverip = intent.getExtras().getString("serverip");
 
         //  initialize all components here
         tv_humidity_value.setText(String.valueOf(MainApplication.getInstance().data.humidity));
@@ -187,15 +203,43 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             if (((Button)v).getText().equals("Water!")){
                 Log.d(TAG,"Click on Water!");
                 //open pump
-                new  Thread(new Runnable() {
+                new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        udp_response response = sendRequest("open pump",serverip,serverport);
-                        switch (response.status){
+                        //udp_response response = sendRequest("open pump",serverip,serverport);
+                        final long baseTimer = SystemClock.elapsedRealtime();
+                        final Timer timer = new Timer("开机计时器");
+                        timer.scheduleAtFixedRate(new TimerTask() {
+                            @Override
+                            public void run() {
+                                int time = (int)((SystemClock.elapsedRealtime() - baseTimer) / 1000);
+                                //String hh = new DecimalFormat("00").format(time / 3600);
+                                String mm = new DecimalFormat("00").format(time % 3600 / 60);
+                                String ss = new DecimalFormat("00").format(time % 60);
+                                String timeFormat = new String( mm + ":" + ss);
+                                Message msg = new Message();
+                                msg.obj = timer;
+                                Bundle bundle = new Bundle();
+                                bundle.putString("timeFormat", timeFormat);
+                                bundle.putInt("time",time);
+                                bundle.putBoolean("stop",false);
+                                msg.setData(bundle);
+                                Timehandler.sendMessage(msg);
+                            }
+                        }, 0, 1000L);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                bt_water.setText("Stop");
+                            }
+                        });
+                        /*switch (response.status){
                             case SUCCEED: // success
                                 Log.d(TAG ,"udp status code: " + String.valueOf(SUCCEED));
                                 Toast.makeText(MainActivity.this,"Open pump successfully", Toast.LENGTH_LONG).show();
                                 // counting time and quality
+
+
 
                                 // change text on button
                                 runOnUiThread(new Runnable() {
@@ -220,7 +264,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                 // give feedback if failed
                                 Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
                                 break;
-                        }
+                        } */
                     }
                 }).start();
             }else if (((Button)v).getText().equals("Stop")){
@@ -230,13 +274,30 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 new  Thread(new Runnable() {
                     @Override
                     public void run() {
-                        udp_response response = sendRequest("close pump",serverip,serverport);
-                        switch (response.status) {
+                        //udp_response response = sendRequest("close pump",serverip,serverport);
+                        // Stop counting quantity and time duration
+                        Bundle bundle = new Bundle();
+                        bundle.putBoolean("stop", true);
+                        Message msg = new Message();
+                        msg.setData(bundle);
+                        Timehandler.sendMessage(msg);
+                        // change text on button
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                bt_water.setText("Water!");
+                            }
+                        });
+                        /*switch (response.status) {
                             case SUCCEED: // success
                                 Log.d(TAG, "udp status code: " + String.valueOf(SUCCEED));
                                 Toast.makeText(MainActivity.this, "Close pump successfully", Toast.LENGTH_LONG).show();
                                 // Stop counting quantity and time duration
-
+                                Bundle bundle = new Bundle();
+                                bundle.putBoolean("stop", true);
+                                Message msg = new Message();
+                                msg.setData(bundle);
+                                Timehandler.sendMessage(msg);
                                 // change text on button
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -260,7 +321,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                 // give feedback if failed
                                 Toast.makeText(MainActivity.this, "unexpected status code", Toast.LENGTH_LONG).show();
                                 break;
-                        }
+                        } */
                     }
                 }).start();
             }
@@ -328,4 +389,22 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         public Float moisture;
         public Float light;
     }
+
+    private Timer timer;
+    @SuppressLint("HandlerLeak")
+    final Handler Timehandler = new Handler(){
+        @SuppressLint("SetTextI18n")
+        public void handleMessage(android.os.Message msg) {
+            if (msg.getData().getBoolean("stop")){
+                timer.cancel();
+            } else{
+                timer = (Timer)msg.obj;
+                if (null != tv_duration_value && null != tv_quantity_value) {
+                    float speed = (float) 1.0;
+                    tv_duration_value.setText((String) msg.getData().getString("timeFormat"));
+                    tv_quantity_value.setText(String.valueOf(((Integer) msg.getData().getInt("time")) * speed ) + "ml");
+                }
+            }
+        }
+    };
 }

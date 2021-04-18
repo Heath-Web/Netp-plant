@@ -7,4 +7,5 @@
     <color name="White">#FFFFFF</color>
     <color name="Black">#000000</color>
     <color name="DividerDark">#ff9f9f9f</color>
+    <color name="None">#00000000</color>
 </resources>
