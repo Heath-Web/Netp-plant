@@ -9,6 +9,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -34,8 +35,9 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     private String serverip = "192.168.101.36"; //server ip address
     private int serverport = 8000; // server port number
 
-    private final int NORMAL = 1;
-    private final int FAILED = -1;
+    private final int SUCCEED = 1; // return status code 1 success
+    private final int FAILED = -1; // return status code -1 failed
+    private final int UDPFAILED = 0; // something wrong when doing udp communication or the response does not in json format
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,22 +63,31 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     @Override
     protected void onResume() {
         super.onResume();
-        // start a new thread to request environment data
+        // start a new thread to acquire environment data
         new Thread(new Runnable(){
             @Override
             public void run() {
-                //Request environment data
+                //send Request to get environment data and receive response
                 udp_response res = sendRequest("get environment",serverip,serverport);
                 switch (res.status) { // handle status code
-                    case NORMAL: //
-                        Log.d(TAG ,"udp status code: " + String.valueOf(NORMAL));
-                        update_environmentData(res);
+                    case SUCCEED: // success
+                        Log.d(TAG ,"udp status code: " + String.valueOf(SUCCEED));
+                        update_environmentData(res); // update android components (refresh UI)
                         break;// update value on UI
-                    case FAILED:
+                    case FAILED: // failed told by server
                         Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
+                        // give feedback if failed
+                        Toast.makeText(MainActivity.this,"Get Environment data failed",Toast.LENGTH_LONG).show();
                         break;
-                    default:
+                    case UDPFAILED: // udp communication failed
+                        Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
+                        // give feedback if failed
+                        Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                        break;
+                    default: // unexpected status code
                         Log.e(TAG ,"Receive other unpredictable status code ");
+                        // give feedback if failed
+                        Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
                         break;
                 }
             }
@@ -95,13 +106,18 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     }
 
     private void update_environmentData(udp_response response){
+        /*
+         * This function refresh the value of humidity, temperature, moisture and light in the user
+         * interface, according to the response. The input response is the udp response received
+         * from server.
+         */
         try{
             //  update global value
             MainApplication.getInstance().data.humidity = response.humidity;
             MainApplication.getInstance().data.temperature = response.temperature;
             MainApplication.getInstance().data.light = response.light;
             MainApplication.getInstance().data.moisture = response.moisture;
-            //update components
+            //refresh corresponding android components
             tv_humidity_value.setText(String.valueOf(MainApplication.getInstance().data.humidity));
             tv_temperature_value.setText(String.valueOf(MainApplication.getInstance().data.temperature));
             tv_moisture_value.setText(String.valueOf(MainApplication.getInstance().data.moisture));
@@ -112,15 +128,18 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     }
 
     private udp_response sendRequest(String request,String ip, int port){
-
         /*
          * This function is used to send a UDP request and receive response
-         * Input : String request :
-         *         String Ip
+         * Input request is the command including 'get environment', 'open pump', 'close pump'
+         * Input ip is the server ip address
+         * Input port is the port number of the server
+         * this function will return a udp_response object
          */
-        String str_reply = null;
-        udp_response response = new udp_response();
+        String str_response = null; //response string format
+        udp_response response = new udp_response(); // create a udp_response object
+        response.status = 0; // initialize status code
         try {
+            // send request to server
             // Define the address of the server
             InetAddress address = InetAddress.getByName(ip);
             byte[] data = request.getBytes();
@@ -132,28 +151,29 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             socket.send(packet);
             Log.d(TAG,"//sendRequest " + "Request \"" + request + "\" send to " + ip + ":" + port);
 
+            // receive response from server
             // Create a datagram to receive data from server
             byte[] data2 = new byte[1024];
             DatagramPacket packet2 = new DatagramPacket(data2, data2.length);
             // receive the response from server
             socket.receive(packet2);
             // read data
-            str_reply = new String(data2, 0, packet2.getLength());
+            str_response = new String(data2, 0, packet2.getLength());
             // Selecting valid characters form string by regex
             String pattern = "(\\{)(.*)(\\})";
             Pattern r = Pattern.compile(pattern); // create Pattern object
-            Matcher m = r.matcher(str_reply); // create matcher object
+            Matcher m = r.matcher(str_response); // create matcher object
             if (m.find( )) {
-                str_reply = m.group(0);
+                str_response = m.group(0);
             } else {
                 Log.e(TAG," Invalid response (the response must be json format)");
             }
-            Log.d(TAG,"//sendRequest " + "Receive response \"" + str_reply + "\" from " + ip + ":" + port);
+            Log.d(TAG,"//sendRequest " + "Receive response \"" + str_response + "\" from " + ip + ":" + port);
             //close socket
             socket.close();
 
-            //convert string to ude response object
-            response = new Gson().fromJson(str_reply, udp_response.class);
+            //convert string to udp response object
+            response = new Gson().fromJson(str_response, udp_response.class);
         } catch (IOException e){
             e.printStackTrace();
             Log.e(TAG , "//sendRequest, There are something wrong when doing udp communication with server");
@@ -165,45 +185,112 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     public void onClick(View v) {
         if (v.getId() == R.id.bt_water){
             if (((Button)v).getText().equals("Water!")){
-                ((Button)v).setText("Stop");
                 Log.d(TAG,"Click on Water!");
                 //open pump
                 new  Thread(new Runnable() {
                     @Override
                     public void run() {
                         udp_response response = sendRequest("open pump",serverip,serverport);
+                        switch (response.status){
+                            case SUCCEED: // success
+                                Log.d(TAG ,"udp status code: " + String.valueOf(SUCCEED));
+                                Toast.makeText(MainActivity.this,"Open pump successfully", Toast.LENGTH_LONG).show();
+                                // counting time and quality
+
+                                // change text on button
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bt_water.setText("Stop");
+                                    }
+                                });
+                                break;// update value on UI
+                            case FAILED: // failed told by server
+                                Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
+                                // give feedback if failed
+                                Toast.makeText(MainActivity.this,"Open Pump failed",Toast.LENGTH_LONG).show();
+                                break;
+                            case UDPFAILED: // udp communication failed
+                                Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
+                                // give feedback if failed
+                                Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                                break;
+                            default: // unexpected status code
+                                Log.e(TAG ,"Receive other unpredictable status code ");
+                                // give feedback if failed
+                                Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
+                                break;
+                        }
                     }
                 }).start();
-
-                // refresh quantity and duration
-
             }else if (((Button)v).getText().equals("Stop")){
-                ((Button)v).setText("Water!");
+
                 Log.d(TAG,"Click on Stop");
                 //close pump
-                //open pump
                 new  Thread(new Runnable() {
                     @Override
                     public void run() {
                         udp_response response = sendRequest("close pump",serverip,serverport);
+                        switch (response.status) {
+                            case SUCCEED: // success
+                                Log.d(TAG, "udp status code: " + String.valueOf(SUCCEED));
+                                Toast.makeText(MainActivity.this, "Close pump successfully", Toast.LENGTH_LONG).show();
+                                // Stop counting quantity and time duration
+
+                                // change text on button
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bt_water.setText("Water!");
+                                    }
+                                });
+                                break;// update value on UI
+                            case FAILED: // failed told by server
+                                Log.d(TAG, "udp status code: " + String.valueOf(FAILED));
+                                // give feedback if failed
+                                Toast.makeText(MainActivity.this, "Close Pump failed", Toast.LENGTH_LONG).show();
+                                break;
+                            case UDPFAILED: // udp communication failed
+                                Log.d(TAG, "udp status code: " + String.valueOf(UDPFAILED));
+                                // give feedback if failed
+                                Toast.makeText(MainActivity.this, "UDP Communication wrong", Toast.LENGTH_LONG).show();
+                                break;
+                            default: // unexpected status code
+                                Log.e(TAG, "Receive other unpredictable status code ");
+                                // give feedback if failed
+                                Toast.makeText(MainActivity.this, "unexpected status code", Toast.LENGTH_LONG).show();
+                                break;
+                        }
                     }
                 }).start();
-
-                // refresh quantity and duration
-
             }
         }
         else if (v.getId() == R.id.bt_refresh){
+            // click on the refresh button
             new Thread(new Runnable(){
                 @Override
                 public void run() {
-                    //Request environment data
+                    //send Request to get environment data and receive response
                     udp_response res = sendRequest("get environment",serverip,serverport);
-                    switch (res.status) {
-                        case NORMAL:
-                            update_environmentData(res);
+                    switch (res.status) { // handle status code
+                        case SUCCEED: // success
+                            Log.d(TAG ,"udp status code: " + String.valueOf(SUCCEED));
+                            update_environmentData(res); // update android components (refresh UI)
                             break;// update value on UI
-                        case FAILED:
+                        case FAILED: // failed told by server
+                            Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
+                            // give feedback if failed
+                            Toast.makeText(MainActivity.this,"Get Environment data failed",Toast.LENGTH_LONG).show();
+                            break;
+                        case UDPFAILED: // udp communication failed
+                            Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
+                            // give feedback if failed
+                            Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                            break;
+                        default: // unexpected status code
+                            Log.e(TAG ,"Receive other unpredictable status code ");
+                            // give feedback if failed
+                            Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
                             break;
                     }
                 }
