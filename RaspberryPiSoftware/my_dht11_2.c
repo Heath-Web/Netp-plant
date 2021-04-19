@@ -95,87 +95,54 @@ int read_dht11_data(char *data)
 /*
  *this function is used to read dht11 data 
  */
-      int i=0;   
-      //1:dht11 init
-      dht11_init();
-      //2:send strat signal
-      dht11_start();
-      //3:waiting for respond
-      if(wait_res()==0)//0=respond 1=no respond 
-      {
-         //4:waiting for dht11  respond end
-         while(wait_res()==0);//waiting for lowlevel end
-         while(wait_res()==1);//waiting for highllevel end
-         //5:start reading data
-         for(i=0;i<5;i++)
-         {
-   	      data[i] = read_byte();
-              if(data[i]==0xcc)
-              {
-                  return 0;//overtime error
-              };
-         }
-         while(digitalRead(DAT)==0);//when dht signal state at lowlevel,it is strat to send data
-         pinMode(DAT,OUTPUT);//set DATpin as output
-         digitalWrite(DAT,1);
-         printf("temperature:%d,humidity:%d\n",data[2],data[0]);
-         //6:check parity have error or not
-         if(check_data(data,5)==1){
-            //printf("temperature:%d,humidity:%d\n",data[2],data[0]);
-            return 1;//right data
-         }else{
-            return 2;//sumdata error
-         }
-      }else{
-           return 3;//no respond
-      }
-
+    int i=0;   
+    //1:dht11 init
+    dht11_init();
+    //2:send strat signal
+    dht11_start();
+    //3:waiting for respond
+    if(wait_res()==0)//0=respond 1=no respond 
+    {
+        //4:waiting for dht11  respond end
+        int wait_counter = 0; // counter used to limit waiting time
+        while(wait_res()==0 && wait_counter<=100){ //waiting for lowlevel end max waiting time 4ms (40us * 100)
+            wait_counter++;
+		}
+		if (wait_counter >= 100){
+		 	printf("find sensor overtime");
+		 	return 4; //find sensor overtime
+		}else{
+		 	wait_counter = 0;
+		 	while(wait_res()==1 && wait_counter <= 100){ //waiting for highllevel end
+		    	wait_counter++;
+			}
+			if (wait_counter >= 100){
+		 		printf("find sensor overtime");
+		 		return 4; //find sensor overtime
+		    }else {
+		       	//5:start reading data
+         		for(i=0;i<5;i++)
+         		{
+   	      			data[i] = read_byte();
+              		if(data[i]==0xcc)
+              		{
+                  	return 0;//overtime error
+              		};
+         		}
+         		while(digitalRead(DAT)==0);//when dht signal state at lowlevel,it is strat to send data
+         		pinMode(DAT,OUTPUT);//set DATpin as output
+         		digitalWrite(DAT,1);
+         		//6:check parity have error or not
+         		if(check_data(data,5)==1){
+            		//printf("temperature:%d,humidity:%d\n",data[2],data[0]);
+            		return 1;//right data
+         		}else{
+            		return 2;//sumdata error
+         		}
+			}
+		} 
+    }else{
+        return 3;//no respond
+    }
 }
-
-/*
-int main()
-{
-   char data[5]="";
-   if(wiringPiSetup()<0)//set raspi encoding mode as wiringPi
-   {
-     perror("raspi start failure...");
-     exit(1);//exit program
-   }
-   while(1)
-   {
-        switch(read_dht11_data(data))
-        {
-           case 0:
-                //puts("overtime...");
-                continue;
-           case 1://正确
-                printf("temperature:%d,humidity:%d\n",data[2],data[0]);
-                break;
-           case 2://校验和错误
-                //puts("parity error....");
-                continue;
-           case 3:
-                //puts("dht11 no respond...");
-                continue;
-           default:
-                puts("other error....");
-                break;
-        }
-        sleep(2);
-   }
-   return 0;
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
 

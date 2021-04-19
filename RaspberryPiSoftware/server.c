@@ -116,60 +116,53 @@ char* generate_response(char recv_buf[], char data[]){
 	 */
 	// initialize send buffer
 	static char send_buf[1024];
-	printf("rf:%s\n",recv_buf);
-	printf("%d\n",strcmp(recv_buf ,"open pump"));
 	int i=0;
 	// Judge the command
 	if (strcmp(recv_buf ,"get enviroment\0")==1){
 		// "get enviroment" command 
 		printf("#command: get enviroment \n");
+		
 		//initialize variables
 		char humidity_str[] = "0"; // humidity string format
 		char temperature_str[] = "0"; // temperature string format
 		char moisture_str[] = "0"; // moisture string format
 		char light_str[] = "0"; // light String format
-		//get humidity adnd temperature
-		read_dht11_data(data); // pre load
-		int code = read_dht11_data(data);
-		int moisture=0;
-		int light = 0;
-		int succeess = 1;  
-		printf("code:%d\n",code);
+		int moisture=0; // moisture 
+		int light = 0; // light
+		int succeess = 1;  // identifier (flag) used to judge succeed or not 1:succeed 0:failed 2:Can not recognize Sensor 
 		
+		//get humidity adnd temperature
+		int code = read_dht11_data(data);	
 		// get moisture
 		ad(0x00);
 		moisture = (255-ad(0x00))*100/255; //range 0-1
-		if (moisture==100){
-			printf("Get moisture failed!");
-			strcpy(send_buf,"{\'status\':-1};");
-		}
-		//moisture = ad(0x00);
-		printf("moisture:0.%d\n",moisture);
-		//printf("mositure:%d\n",moisture);
-		// light
+		//get light intensity
 		ad(0x02);
 		light = (255-ad(0x02))*100/255;
-		//light = ad(0x02);
-		if (moisture==100){
-			printf("Get moisture failed!");
+		
+		// check wthether success and change flag
+		if (moisture==100 || light==100 || code == 4){
+			printf("Moisture or light Sensor doesn't online'!\n");
+			succeess = 2;
+		}else if(code == 0 || code == 2 || code == 3){
+			succeess = 0;
+		}else {
 			succeess = 0;
 		}
-		printf("light:0.%d\n",light);
-		
-		if (code != 3){
-			succeess = 0;
-		}
-		
+		 
 		switch(succeess){
 			case 1:
 				printf("get enviroment data succeed\n");
 				printf("humidity:%d\n",data[0]);
 				printf("temperature:%d\n",data[2]);
+				printf("moisture:0.%d\n",moisture);
+				printf("light:0.%d\n",light);
 
-				//printf("light:%d\n",light);
 				//Converts integers to string
 				sprintf(humidity_str,"%d",data[0]); 
 				sprintf(temperature_str,"%d",data[2]); 
+				//sprintf(humidity_str,"%d",10); 
+				//sprintf(temperature_str,"%d",20); 
 				sprintf(moisture_str,"%d",moisture);
 				sprintf(light_str,"%d",light);
 				
@@ -187,13 +180,17 @@ char* generate_response(char recv_buf[], char data[]){
 				break;
 			
 			case 0:
-				
-				printf("code:%d\n",code);
 				// something wrong when getting humidity and temperature
 				printf("get enviroment data failed\n");
 				// send buffer status code = -1
 				strcpy(send_buf,"{\'status\':-1};");
-				break;		
+				break;
+				
+			case 2:
+				// Seneor connection error
+				printf("Seneor connection error\n");
+				// send buffer status code = 2
+				strcpy(send_buf,"{\'status\':2};");		
 		}
 	}else if (strcmp(recv_buf ,"open pump")==0){
 		//open pump command

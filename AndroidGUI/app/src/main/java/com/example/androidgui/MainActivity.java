@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     private final int SUCCEED = 1; // return status code 1 success
     private final int FAILED = -1; // return status code -1 failed
     private final int UDPFAILED = 0; // something wrong when doing udp communication or the response does not in json format
+    private final int SENSOROFFLINE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +103,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                             @Override
                             public void run() {
                                 Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        break;
+                    case SENSOROFFLINE:// sensor dose not online
+                        Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
+                        // give feedback if failed
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this,"Sensor offline Please Check your sensor!",Toast.LENGTH_LONG).show();
                             }
                         });
                         break;
@@ -270,6 +281,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                     }
                                 });
                                 break;
+                            case SENSOROFFLINE:// sensor dose not online
+                                Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
+                                // give feedback if failed
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this,"Sensor offline Please Check your sensor!",Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                break;
                             default: // unexpected status code
                                 Log.e(TAG ,"Receive other unpredictable status code ");
                                 // give feedback if failed
@@ -316,6 +337,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                     @Override
                                     public void run() {
                                         Toast.makeText(MainActivity.this, "Close Pump failed", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                break;
+                            case SENSOROFFLINE:// sensor dose not online
+                                Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
+                                // give feedback if failed
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this,"Sensor offline Please Check your sensor!",Toast.LENGTH_LONG).show();
                                     }
                                 });
                                 break;
@@ -368,6 +399,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                 @Override
                                 public void run() {
                                     Toast.makeText(MainActivity.this,"Get Environment data failed",Toast.LENGTH_LONG).show();
+                                }
+                            });
+                            break;
+                        case SENSOROFFLINE:// sensor dose not online
+                            Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
+                            // give feedback if failed
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.this,"Sensor offline Please Check your sensor!",Toast.LENGTH_LONG).show();
                                 }
                             });
                             break;
