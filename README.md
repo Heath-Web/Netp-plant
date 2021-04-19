@@ -8,7 +8,7 @@ description here one sentence
 
 [*Jiahui Ren*](https://github.com/paymorepatience)       2550208W
 
-[*Feng Ni*](https://github.com/FENGN-AII)           2550208W
+[*Feng Ni*](https://github.com/FENGN-AII)           2511633N
 
 ## Overview
 
@@ -54,7 +54,7 @@ In order to be able to run the server on Raspberry Pi:
 2. `cd  RaspberryPiSoftware`
 3. g++ -c server.c
 4. g++ -c module.cpp
-5. g++ module.o server.o -o ts -lwiringPi
+5. g++ module.o server.o -o server -lwiringPi
 
 **final:** 
 
