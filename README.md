@@ -16,14 +16,14 @@ The aim of this project is to design and fabricate a prototype auto irrigation s
 
 ## Required hardware
 
-Raspberry Pi 4b
-DHT11 Temperature and humidity sensor
-LM393 Soil Moisture sensor
-5516 Light sensor
-PCF8591 AD conversion moudle
-1 Relay Module
-5v Water pump
-Buttery power supply
+Raspberry Pi 4b  
+DHT11 Temperature and humidity sensor  
+LM393 Soil Moisture sensor  
+5516 Light sensor  
+PCF8591 AD conversion moudle  
+1 Relay Module  
+5v Water pump  
+Buttery power supply  
 
 #### System Flow chart
 
