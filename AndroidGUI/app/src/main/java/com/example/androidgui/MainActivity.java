@@ -25,7 +25,6 @@ import java.net.InetAddress;
 
 import com.google.gson.Gson;
 
-import java.sql.Time;
 import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -80,11 +79,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             @Override
             public void run() {
                 //send Request to get environment data and receive response
-                udp_response res = sendRequest("get environment",serverip,serverport);
+                final udp_response res = sendRequest("get environment",serverip,serverport);
                 switch (res.status) { // handle status code
                     case SUCCEED: // success
                         Log.d(TAG ,"udp status code: " + String.valueOf(SUCCEED));
-                        update_environmentData(res); // update android components (refresh UI)
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                update_environmentData(res); // update android components (refresh UI)
+                            }
+                        });
                         break;// update value on UI
                     case FAILED: // failed told by server
                         Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
@@ -208,7 +212,13 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             response = new Gson().fromJson(str_response, udp_response.class);
         } catch (IOException e){
             e.printStackTrace();
-            Log.e(TAG , "//sendRequest, There are something wrong when doing udp communication with server");
+            Log.d(TAG , "//sendRequest, There are something wrong when doing udp communication with server");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(MainActivity.this," opne auto unexpected status code",Toast.LENGTH_LONG).show();
+                }
+            });
         }
         return response;
     }
@@ -226,7 +236,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                         switch (response.status){
                             case SUCCEED: // success
                                 Log.d(TAG ,"udp status code: " + String.valueOf(SUCCEED));
-                                Toast.makeText(MainActivity.this,"Open pump successfully", Toast.LENGTH_LONG).show();
                                 // counting time and quality
                                 final long baseTimer = SystemClock.elapsedRealtime();
                                 final Timer timer = new Timer("开机计时器");
@@ -252,6 +261,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        Toast.makeText(MainActivity.this,"Open pump successfully", Toast.LENGTH_LONG).show();
                                         bt_water.setText("Stop");
                                     }
                                 });
@@ -290,7 +300,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                     }
                 }).start();
             }else if (((Button)v).getText().equals("Stop")){
-
                 Log.d(TAG,"Click on Stop");
                 //close pump
                 new  Thread(new Runnable() {
@@ -356,11 +365,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 @Override
                 public void run() {
                     //send Request to get environment data and receive response
-                    udp_response res = sendRequest("get environment",serverip,serverport);
+                    final udp_response res = sendRequest("get environment",serverip,serverport);
                     switch (res.status) { // handle status code
                         case SUCCEED: // success
                             Log.d(TAG ,"udp status code: " + String.valueOf(SUCCEED));
-                            update_environmentData(res); // update android components (refresh UI)
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    update_environmentData(res); // update android components (refresh UI)
+                                }
+                            });
                             break;// update value on UI
                         case FAILED: // failed told by server
                             Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
@@ -408,6 +422,12 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 @Override
                 public void run() {
                     sendRequest("open auto",serverip,serverport);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this,"creeper!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
             }).start();
         }else{
