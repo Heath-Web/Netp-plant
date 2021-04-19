@@ -40,6 +40,7 @@ int main(){
 		//wait to receive any requests from client
 		printf("server wait...\n");
 		// receive data
+		strcpy(recv_buf,"");
 		recv_length = recvfrom(sock_fd, recv_buf, MAXLINE, 0, (struct sockaddr *)&addr_client, (socklen_t *)&len);
 		if(recv_length < 0)
     	{
@@ -48,8 +49,9 @@ int main(){
     	}
     	recv_buf[recv_length] = '\0';
     	printf("server receive %d bytes: %s\n", recv_length, recv_buf);
-
+		
 		// generate response (json format)
+		strcpy(send_buf,"");
 		strcpy(send_buf,generate_response(recv_buf,data));
 		//send data to client
     	send_length = sendto(sock_fd, send_buf, sizeof(send_buf), 0, (struct sockaddr *)&addr_client, len);
@@ -114,8 +116,10 @@ char* generate_response(char recv_buf[], char data[]){
 	 */
 	// initialize send buffer
 	static char send_buf[1024];
+	printf("rf:%s\n",recv_buf);
+	printf("%d\n",strcmp(recv_buf ,"open pump"));
 	// Judge the command
-	if (strcmp(recv_buf ,"get enviroment")){
+	if (strcmp(recv_buf ,"get enviroment\0")==1){
 		// "get enviroment" command 
 		printf("#command: get enviroment \n");
 		//initialize variables
@@ -126,18 +130,23 @@ char* generate_response(char recv_buf[], char data[]){
 		//get humidity adnd temperature
 		read_dht11_data(data); // pre load
 		int code = read_dht11_data(data);
+		float moisture=0;
+		float light = 0;
+		printf("code:%d\n",code);
 		switch(code){
-			case 1:
+			case 3:
 				printf("get enviroment data succeed\n");
 				printf("humidity:%d\n",data[0]);
 				printf("temperature:%d\n",data[2]);
 				// get moisture
-				int moisture = ad(0x00);
-				printf("moisture:%d\n",moisture);
+				ad(0x00);
+				moisture = float(255-ad(0x00))/(float)255; //range 0-1
+				printf("moisture:%.2f\n",moisture);
 				// light
-				int light = ad(0x01);
-				printf("light:%d\n",light);
-				
+				ad(0x02);
+				light = (float)(255-ad(0x02))/(float)255;
+				printf("light:%.2f\n",light);
+	
 				//Converts integers to string
 				sprintf(humidity_str,"%d",data[0]); 
 				sprintf(temperature_str,"%d",data[2]); 
@@ -156,30 +165,33 @@ char* generate_response(char recv_buf[], char data[]){
 				strcat(send_buf,"}");
 				//strcpy(send_buf,"{\'status\':1,\'humidity\':12.0,\'temperature\':13.0,\'moisture\':1.0,\'light\':45}");
 				break;
-			default:
+			
+			case 0:
+			case 1:
+			case 2:
+				
+				printf("code:%d\n",code);
 				// something wrong when getting humidity and temperature
 				printf("get enviroment data failed\n");
 				// send buffer status code = -1
 				strcpy(send_buf,"{\'status\':-1}");
 				break;		
 		}
-	}else if (strcmp(recv_buf ,"open pump")){
+	}else if (strcmp(recv_buf ,"open pump")==0){
 		//open pump command
 		printf("#command: open pump \n");
 		//open pump
 		relay();
 		//response status code=1
 		strcpy(send_buf,"{\'status\':1}");
-	}else if (strcmp(recv_buf ,"close pump")){
+	}else if (strcmp(recv_buf ,"close pump")==1){
 		//close pump command
 		printf("#command: close pump \n");
 		//close pump
-		
-		
 		//response status code=1
 		strcpy(send_buf,"{\'status\':1}");
 	}else {
-		printf("#command does not exist: %s \n", &recv_buf);
+		printf("#command does not exist: %s \n", recv_buf);
 		strcpy(send_buf,"{\'status\':-1}");
 	}
 	// return send buffer

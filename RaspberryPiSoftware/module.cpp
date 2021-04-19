@@ -11,52 +11,50 @@ using namespace std;
 #define relay_gpio 0
 #define DAT 2
 
-
+//Write
 void write(int data){
 	
 	int i = 0;
 	int j = 0x80;
 	for(i=0;i<8;i++){
 		
-		digitalWrite(9,LOW);
-		usleep(5);
 		if(data&j){
-
 			digitalWrite(8,HIGH);
 			j=j>>1;
-	
-		
+			usleep(5);
 		}else{
-		
 			digitalWrite(8,LOW);
-
 			j=j>>1;
-		
-			}
+			usleep(5);
+		}
 
 		digitalWrite(9,HIGH);
 		usleep(5);
+		digitalWrite(9,LOW);
 	}
-
-	digitalWrite(9,LOW);
-	usleep(5);
+	
 	digitalWrite(8,HIGH);
-	pinMode(8,INPUT);
-	pullUpDnControl(8,PUD_UP);
-	usleep(5);
 }
 
+//Acknowledge
 void ack(void){
 	
+	cout << digitalRead(8) << endl;
+	pinMode(8,INPUT);
+	pullUpDnControl(8,PUD_UP); 
+	cout << digitalRead(8) << endl;
 	while(digitalRead(8) == 1);
 	digitalWrite(9,HIGH);
 	usleep(5);
+	cout << digitalRead(8) << endl;
 	digitalWrite(9,LOW);
-	while(digitalRead(8) == 0);
+	pinMode(8,OUTPUT);
+	digitalWrite(8,HIGH);
 	usleep(5);
 	
 }
 
+//No acknowledge
 void noack(void){
 	
 	pinMode(8,OUTPUT);
@@ -68,6 +66,7 @@ void noack(void){
 	
 }
 
+//Read Byte
 int read(void){
 	
 	int i;
@@ -75,7 +74,8 @@ int read(void){
 	pinMode(8,INPUT);
 	pullUpDnControl(8,PUD_UP);
 	digitalWrite(9,LOW);
-	for(i=0;i<7;i++){
+
+	for(i=0;i<8;i++){
 		
 		digitalWrite(9,HIGH);
 		usleep(5);
@@ -89,49 +89,52 @@ int read(void){
 
 }
 
+//AD change
 int ad(int add){	
 	pinMode(8,OUTPUT);
 	pinMode(9,OUTPUT);
 	int fd = wiringPiI2CSetup(ad_address);
 	digitalWrite(9,HIGH);
-	usleep(1);
+	usleep(5);
 	digitalWrite(8,HIGH);
-	usleep(2);
+	usleep(5);
 	
 	//start
 	digitalWrite(8,LOW);
-	usleep(1);
+	usleep(5);
+	digitalWrite(9,LOW);
 
-	//wrute
+	//write		
 	write(0x90);
 	ack();
-	pinMode(8,OUTPUT);
 	write(add);
 	ack();
-	pinMode(8,OUTPUT);
 
-	//stop
+	//stop I2C
 	digitalWrite(8,LOW);
 	usleep(5);
 	digitalWrite(9,HIGH);
 	usleep(5);
 	digitalWrite(8,HIGH);
-
-	//¶Á
-	//ÊäËÍµØÖ·
+	usleep(10);
+	
+	//read
+	//send address
 	digitalWrite(8,HIGH);
 	digitalWrite(9,HIGH);
 	usleep(5);
 	digitalWrite(8,LOW);
 	usleep(5);
+	digitalWrite(9,LOW);
 	write(0x91);
 	usleep(5);
 	ack();
-	pinMode(8,OUTPUT);
-	
-	//read
+	usleep(10);
+	//reading	
 	int data = read(); 
 	noack();
+
+	//Stop I2C
 	pinMode(8,OUTPUT);
 	digitalWrite(8,LOW);
 	usleep(5);
@@ -142,12 +145,13 @@ int ad(int add){
 	return data;
 }
 
-
+//Open bump 5 sec
 void relay(void){
 
 	pinMode(relay_gpio, OUTPUT);
 	digitalWrite(relay_gpio, LOW);
 	sleep(5);
 	digitalWrite(relay_gpio, HIGH);
+
 }
 
