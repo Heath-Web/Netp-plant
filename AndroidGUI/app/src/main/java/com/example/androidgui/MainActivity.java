@@ -89,17 +89,32 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                     case FAILED: // failed told by server
                         Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
                         // give feedback if failed
-                        Toast.makeText(MainActivity.this,"Get Environment data failed",Toast.LENGTH_LONG).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this,"Get Environment data failed",Toast.LENGTH_LONG).show();
+                            }
+                        });
                         break;
                     case UDPFAILED: // udp communication failed
                         Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
                         // give feedback if failed
-                        Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                            }
+                        });
                         break;
                     default: // unexpected status code
                         Log.e(TAG ,"Receive other unpredictable status code ");
                         // give feedback if failed
-                        Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
+                            }
+                        });
                         break;
                 }
             }
@@ -156,6 +171,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         response.status = 0; // initialize status code
         try {
             // send request to server
+            Log.d(TAG,"//sendRequest " + "Aim server: " + ip + ":" + port);
             // Define the address of the server
             InetAddress address = InetAddress.getByName(ip);
             byte[] data = request.getBytes();
@@ -206,41 +222,32 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        //udp_response response = sendRequest("open pump",serverip,serverport);
-                        final long baseTimer = SystemClock.elapsedRealtime();
-                        final Timer timer = new Timer("开机计时器");
-                        timer.scheduleAtFixedRate(new TimerTask() {
-                            @Override
-                            public void run() {
-                                int time = (int)((SystemClock.elapsedRealtime() - baseTimer) / 1000);
-                                //String hh = new DecimalFormat("00").format(time / 3600);
-                                String mm = new DecimalFormat("00").format(time % 3600 / 60);
-                                String ss = new DecimalFormat("00").format(time % 60);
-                                String timeFormat = new String( mm + ":" + ss);
-                                Message msg = new Message();
-                                msg.obj = timer;
-                                Bundle bundle = new Bundle();
-                                bundle.putString("timeFormat", timeFormat);
-                                bundle.putInt("time",time);
-                                bundle.putBoolean("stop",false);
-                                msg.setData(bundle);
-                                Timehandler.sendMessage(msg);
-                            }
-                        }, 0, 1000L);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                bt_water.setText("Stop");
-                            }
-                        });
-                        /*switch (response.status){
+                        udp_response response = sendRequest("open pump",serverip,serverport);
+                        switch (response.status){
                             case SUCCEED: // success
                                 Log.d(TAG ,"udp status code: " + String.valueOf(SUCCEED));
                                 Toast.makeText(MainActivity.this,"Open pump successfully", Toast.LENGTH_LONG).show();
                                 // counting time and quality
-
-
-
+                                final long baseTimer = SystemClock.elapsedRealtime();
+                                final Timer timer = new Timer("开机计时器");
+                                timer.scheduleAtFixedRate(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        int time = (int)((SystemClock.elapsedRealtime() - baseTimer) / 1000);
+                                        //String hh = new DecimalFormat("00").format(time / 3600);
+                                        String mm = new DecimalFormat("00").format(time % 3600 / 60);
+                                        String ss = new DecimalFormat("00").format(time % 60);
+                                        String timeFormat = new String( mm + ":" + ss);
+                                        Message msg = new Message();
+                                        msg.obj = timer;
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString("timeFormat", timeFormat);
+                                        bundle.putInt("time",time);
+                                        bundle.putBoolean("stop",false);
+                                        msg.setData(bundle);
+                                        Timehandler.sendMessage(msg);
+                                    }
+                                }, 0, 1000L);
                                 // change text on button
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -252,19 +259,34 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                             case FAILED: // failed told by server
                                 Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
                                 // give feedback if failed
-                                Toast.makeText(MainActivity.this,"Open Pump failed",Toast.LENGTH_LONG).show();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this,"Open Pump failed",Toast.LENGTH_LONG).show();
+                                    }
+                                });
                                 break;
                             case UDPFAILED: // udp communication failed
                                 Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
                                 // give feedback if failed
-                                Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                                    }
+                                });
                                 break;
                             default: // unexpected status code
                                 Log.e(TAG ,"Receive other unpredictable status code ");
                                 // give feedback if failed
-                                Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
+                                    }
+                                });
                                 break;
-                        } */
+                        }
                     }
                 }).start();
             }else if (((Button)v).getText().equals("Stop")){
@@ -274,21 +296,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 new  Thread(new Runnable() {
                     @Override
                     public void run() {
-                        //udp_response response = sendRequest("close pump",serverip,serverport);
-                        // Stop counting quantity and time duration
-                        Bundle bundle = new Bundle();
-                        bundle.putBoolean("stop", true);
-                        Message msg = new Message();
-                        msg.setData(bundle);
-                        Timehandler.sendMessage(msg);
-                        // change text on button
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                bt_water.setText("Water!");
-                            }
-                        });
-                        /*switch (response.status) {
+                        udp_response response = sendRequest("close pump",serverip,serverport);
+                        switch (response.status) {
                             case SUCCEED: // success
                                 Log.d(TAG, "udp status code: " + String.valueOf(SUCCEED));
                                 Toast.makeText(MainActivity.this, "Close pump successfully", Toast.LENGTH_LONG).show();
@@ -305,23 +314,38 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                         bt_water.setText("Water!");
                                     }
                                 });
-                                break;// update value on UI
+                                break;
                             case FAILED: // failed told by server
                                 Log.d(TAG, "udp status code: " + String.valueOf(FAILED));
                                 // give feedback if failed
-                                Toast.makeText(MainActivity.this, "Close Pump failed", Toast.LENGTH_LONG).show();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, "Close Pump failed", Toast.LENGTH_LONG).show();
+                                    }
+                                });
                                 break;
                             case UDPFAILED: // udp communication failed
                                 Log.d(TAG, "udp status code: " + String.valueOf(UDPFAILED));
                                 // give feedback if failed
-                                Toast.makeText(MainActivity.this, "UDP Communication wrong", Toast.LENGTH_LONG).show();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, "UDP Communication wrong", Toast.LENGTH_LONG).show();
+                                    }
+                                });
                                 break;
                             default: // unexpected status code
                                 Log.e(TAG, "Receive other unpredictable status code ");
                                 // give feedback if failed
-                                Toast.makeText(MainActivity.this, "unexpected status code", Toast.LENGTH_LONG).show();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, "unexpected status code", Toast.LENGTH_LONG).show();
+                                    }
+                                });
                                 break;
-                        } */
+                        }
                     }
                 }).start();
             }
@@ -341,17 +365,32 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                         case FAILED: // failed told by server
                             Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
                             // give feedback if failed
-                            Toast.makeText(MainActivity.this,"Get Environment data failed",Toast.LENGTH_LONG).show();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.this,"Get Environment data failed",Toast.LENGTH_LONG).show();
+                                }
+                            });
                             break;
                         case UDPFAILED: // udp communication failed
                             Log.d(TAG ,"udp status code: " + String.valueOf(UDPFAILED));
                             // give feedback if failed
-                            Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.this,"UDP Communication wrong",Toast.LENGTH_LONG).show();
+                                }
+                            });
                             break;
                         default: // unexpected status code
                             Log.e(TAG ,"Receive other unpredictable status code ");
                             // give feedback if failed
-                            Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.this,"unexpected status code",Toast.LENGTH_LONG).show();
+                                }
+                            });
                             break;
                     }
                 }
