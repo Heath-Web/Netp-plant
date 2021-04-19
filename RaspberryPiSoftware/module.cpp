@@ -39,18 +39,24 @@ void write(int data){
 }
 
 //Acknowledge
-void ack(void){
+int ack(void){
 	
+	int time=0;
 	pinMode(8,INPUT);
-	pullUpDnControl(8,PUD_UP); 
-	while(digitalRead(8) == 1);
+	pullUpDnControl(8,PUD_UP);
+	while(digitalRead(8) == 1){
+		time++;
+		if (time == 3000){
+			return 0;
+		}
+	};
 	digitalWrite(9,HIGH);
 	usleep(5);
 	digitalWrite(9,LOW);
 	pinMode(8,OUTPUT);
 	digitalWrite(8,HIGH);
 	usleep(5);
-	
+	return 1;
 }
 
 //No acknowledge
@@ -105,9 +111,13 @@ int ad(int add){
 
 	//write		
 	write(0x90);
-	ack();
+	if (ack()==0){
+		return 0;
+	}
 	write(add);
-	ack();
+	if (ack()==0){
+		return 0;
+	}
 
 	//stop I2C
 	digitalWrite(8,LOW);
@@ -127,7 +137,9 @@ int ad(int add){
 	digitalWrite(9,LOW);
 	write(0x91);
 	usleep(5);
-	ack();
+	if (ack()==0){
+		return 0;
+	}
 	usleep(10);
 	//reading	
 	int data = read(); 

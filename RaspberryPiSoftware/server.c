@@ -133,23 +133,39 @@ char* generate_response(char recv_buf[], char data[]){
 		int code = read_dht11_data(data);
 		int moisture=0;
 		int light = 0;
+		int succeess = 1;  
 		printf("code:%d\n",code);
-		switch(code){
-			case 3:
+		
+		// get moisture
+		ad(0x00);
+		moisture = (255-ad(0x00))*100/255; //range 0-1
+		if (moisture==100){
+			printf("Get moisture failed!");
+			strcpy(send_buf,"{\'status\':-1};");
+		}
+		//moisture = ad(0x00);
+		printf("moisture:0.%d\n",moisture);
+		//printf("mositure:%d\n",moisture);
+		// light
+		ad(0x02);
+		light = (255-ad(0x02))*100/255;
+		//light = ad(0x02);
+		if (moisture==100){
+			printf("Get moisture failed!");
+			succeess = 0;
+		}
+		printf("light:0.%d\n",light);
+		
+		if (code != 3){
+			succeess = 0;
+		}
+		
+		switch(succeess){
+			case 1:
 				printf("get enviroment data succeed\n");
 				printf("humidity:%d\n",data[0]);
 				printf("temperature:%d\n",data[2]);
-				// get moisture
-				ad(0x00);
-				moisture = (255-ad(0x00))*100/255; //range 0-1
-				//moisture = ad(0x00);
-				printf("moisture:0.%d\n",moisture);
-				//printf("mositure:%d\n",moisture);
-				// light
-				ad(0x02);
-				light = (255-ad(0x02))*100/255;
-				//light = ad(0x02);
-				printf("light:0.%d\n",light);
+
 				//printf("light:%d\n",light);
 				//Converts integers to string
 				sprintf(humidity_str,"%d",data[0]); 
@@ -171,8 +187,6 @@ char* generate_response(char recv_buf[], char data[]){
 				break;
 			
 			case 0:
-			case 1:
-			case 2:
 				
 				printf("code:%d\n",code);
 				// something wrong when getting humidity and temperature
