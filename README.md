@@ -14,6 +14,17 @@ Auto irrigation through Raspberry Pi and monitor environment data of home plants
 
 The aim of this project is to design and fabricate a prototype auto irrigation system for home plants. Users can monitor the environment data like air humidity and temperature soil moisture and light intensity.  It also have a water pump button to start or stop the water flow. in addition, the irrigation time and the yield of water is available to show in the interface.  
 
+## Required hardware
+
+Raspberry Pi 4b
+DHT11 Temperature and humidity sensor
+LM393 Soil Moisture sensor
+5516 Light sensor
+PCF8591 AD conversion moudle
+1 Relay Module
+5v Water pump
+Buttery power supply
+
 #### System Flow chart
 
 <img src="https://github.com/paymorepatience/Netp-plant/blob/main/Media/Images/SystemFlowChart.png">
