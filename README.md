@@ -16,7 +16,7 @@ description here one sentence
 
 ##### System Flow chart
 
-![流程图](G:\课件\PG courseware\Semester2\嵌入式\流程图.png)
+![流程图](https://github.com/paymorepatience/Netp-plant/blob/main/Media/Images/%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
 
 ##### File Structure
 
