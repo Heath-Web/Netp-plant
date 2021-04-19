@@ -51,8 +51,10 @@ The repository consists of 3 folders:
 In order to be able to run the server on Raspberry Pi:
 
 1. Download Server folder to Respberry Pi
-2. `cd  xxx`
-3. 
+2. `cd  RaspberryPiSoftware`
+3. g++ -c server.c
+4. g++ -c module.cpp
+5. g++ module.o server.o -o ts -lwiringPi
 
 **final:** 
 
