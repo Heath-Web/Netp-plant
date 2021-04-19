@@ -3,7 +3,6 @@ package com.example.androidgui;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,10 +26,8 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class MainActivity extends AppCompatActivity  implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class MainActivity extends AppCompatActivity  implements View.OnClickListener {
     private final static String TAG = "MainActivity"; // TAG of this activity
     private TextView tv_humidity_value; // air humidity Textview
     private TextView tv_temperature_value; // Temperature Textview
@@ -40,7 +36,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     private TextView tv_quantity_value; // water quantity  Textview
     private TextView tv_duration_value; // water duration Textview
     private Button bt_water; // button used to open and close pump
-    private Switch sw_auto_irrigation; // auto irrigation switch button
     private ImageButton bt_refresh; //button used to update environment data
 
     private String serverip ; //server ip address
@@ -62,7 +57,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         tv_quantity_value = findViewById(R.id.tv_quantity_value);
         tv_duration_value = findViewById(R.id.tv_duration_value);
         bt_water = findViewById(R.id.bt_water);
-        sw_auto_irrigation = findViewById(R.id.sw_auto_irrigation);
+        //sw_auto_irrigation = findViewById(R.id.sw_auto_irrigation);
         bt_refresh = findViewById(R.id.bt_refresh);
         //  initialize all global value
         MainApplication.getInstance().data.humidity = (float) 0;
@@ -136,10 +131,10 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         tv_quantity_value.setText("0 ml");
         tv_duration_value.setText("0 s");
         bt_water.setOnClickListener(this); // add  click listener
-        sw_auto_irrigation.setOnCheckedChangeListener(this); // add checked changed listener
-        bt_refresh.setOnClickListener(this);
+        bt_refresh.setOnClickListener(this); // add  on click listener
     }
 
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void update_environmentData(udp_response response){
         /*
          * This function refresh the value of humidity, temperature, moisture and light in the user
@@ -152,11 +147,11 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             MainApplication.getInstance().data.temperature = response.temperature;
             MainApplication.getInstance().data.light = response.light;
             MainApplication.getInstance().data.moisture = response.moisture;
-            //refresh corresponding android components
-            tv_humidity_value.setText(String.valueOf(MainApplication.getInstance().data.humidity));
-            tv_temperature_value.setText(String.valueOf(MainApplication.getInstance().data.temperature));
-            tv_moisture_value.setText(String.valueOf(MainApplication.getInstance().data.moisture));
-            tv_light_value.setText(String.valueOf(MainApplication.getInstance().data.light));
+            //refresh corresponding android components and keep two decimals
+            tv_humidity_value.setText(String.format("%.2f",MainApplication.getInstance().data.humidity/(float)100).toString());
+            tv_temperature_value.setText(String.format("%.2f",MainApplication.getInstance().data.temperature/(float)100).toString());
+            tv_moisture_value.setText(String.format("%.2f",MainApplication.getInstance().data.moisture/(float)100).toString());
+            tv_light_value.setText(String.format("%.2f",MainApplication.getInstance().data.light/(float)100).toString());
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -195,15 +190,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             socket.receive(packet2);
             // read data
             str_response = new String(data2, 0, packet2.getLength());
-            // Selecting valid characters form string by regex
-            String pattern = "(\\{)(.*)(\\})";
-            Pattern r = Pattern.compile(pattern); // create Pattern object
-            Matcher m = r.matcher(str_response); // create matcher object
-            if (m.find( )) {
-                str_response = m.group(0);
-            } else {
-                Log.e(TAG," Invalid response (the response must be json format)");
-            }
+            // Selecting valid characters form string
+            str_response = str_response.split(";")[0];
             Log.d(TAG,"//sendRequest " + "Receive response \"" + str_response + "\" from " + ip + ":" + port);
             //close socket
             socket.close();
@@ -212,13 +200,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             response = new Gson().fromJson(str_response, udp_response.class);
         } catch (IOException e){
             e.printStackTrace();
-            Log.d(TAG , "//sendRequest, There are something wrong when doing udp communication with server");
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(MainActivity.this," opne auto unexpected status code",Toast.LENGTH_LONG).show();
-                }
-            });
+            Log.e(TAG , "//sendRequest, There are something wrong when doing udp communication with server");
         }
         return response;
     }
@@ -232,21 +214,23 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        //send Request to open pump and receive response
                         udp_response response = sendRequest("open pump",serverip,serverport);
                         switch (response.status){
                             case SUCCEED: // success
                                 Log.d(TAG ,"udp status code: " + String.valueOf(SUCCEED));
-                                // counting time and quality
-                                final long baseTimer = SystemClock.elapsedRealtime();
-                                final Timer timer = new Timer("开机计时器");
+                                // counting time and quantity
+                                final long baseTimer = SystemClock.elapsedRealtime(); // Now time
+                                final Timer timer = new Timer("Timer");
                                 timer.scheduleAtFixedRate(new TimerTask() {
                                     @Override
                                     public void run() {
+                                        // calculate time duration in seconds
                                         int time = (int)((SystemClock.elapsedRealtime() - baseTimer) / 1000);
-                                        //String hh = new DecimalFormat("00").format(time / 3600);
                                         String mm = new DecimalFormat("00").format(time % 3600 / 60);
                                         String ss = new DecimalFormat("00").format(time % 60);
                                         String timeFormat = new String( mm + ":" + ss);
+                                        // Create Message and send to UI Thread. Message include timer object and time duration
                                         Message msg = new Message();
                                         msg.obj = timer;
                                         Bundle bundle = new Bundle();
@@ -257,7 +241,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                         Timehandler.sendMessage(msg);
                                     }
                                 }, 0, 1000L);
-                                // change text on button
+                                // change text on button and give feedback
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -265,7 +249,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                         bt_water.setText("Stop");
                                     }
                                 });
-                                break;// update value on UI
+                                break;
                             case FAILED: // failed told by server
                                 Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
                                 // give feedback if failed
@@ -305,22 +289,23 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 new  Thread(new Runnable() {
                     @Override
                     public void run() {
+                        //send Request to close pump and receive response
                         udp_response response = sendRequest("close pump",serverip,serverport);
                         switch (response.status) {
                             case SUCCEED: // success
                                 Log.d(TAG, "udp status code: " + String.valueOf(SUCCEED));
-                                Toast.makeText(MainActivity.this, "Close pump successfully", Toast.LENGTH_LONG).show();
                                 // Stop counting quantity and time duration
                                 Bundle bundle = new Bundle();
                                 bundle.putBoolean("stop", true);
-                                Message msg = new Message();
+                                Message msg = new Message(); // Create message with true flag "stop"
                                 msg.setData(bundle);
                                 Timehandler.sendMessage(msg);
-                                // change text on button
+                                // change text on button and give feed back
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         bt_water.setText("Water!");
+                                        Toast.makeText(MainActivity.this, "Close pump successfully", Toast.LENGTH_LONG).show();
                                     }
                                 });
                                 break;
@@ -375,7 +360,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                     update_environmentData(res); // update android components (refresh UI)
                                 }
                             });
-                            break;// update value on UI
+                            break;
                         case FAILED: // failed told by server
                             Log.d(TAG ,"udp status code: " + String.valueOf(FAILED));
                             // give feedback if failed
@@ -412,56 +397,31 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         }
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        // auto
-        Log.d(TAG,"Switch button checked changed");
-        if (isChecked){
-            //open auto
-            new  Thread(new Runnable() {
-                @Override
-                public void run() {
-                    sendRequest("open auto",serverip,serverport);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(MainActivity.this,"creeper!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            }).start();
-        }else{
-            //close auto
-            new  Thread(new Runnable() {
-                @Override
-                public void run() {
-                    sendRequest("close auto",serverip,serverport);
-                }
-            }).start();
-        }
-    }
-
+    // UDP response class
     class udp_response{
         public int status; // status code
-        public Float humidity;
-        public Float temperature;
-        public Float moisture;
-        public Float light;
+        public Float humidity; // humidity
+        public Float temperature; // temperature
+        public Float moisture; // moisture
+        public Float light; // light intensity
     }
 
-    private Timer timer;
+    // Handler to handle message from timer
+    private Timer timer; // timer
     @SuppressLint("HandlerLeak")
     final Handler Timehandler = new Handler(){
         @SuppressLint("SetTextI18n")
         public void handleMessage(android.os.Message msg) {
             if (msg.getData().getBoolean("stop")){
-                timer.cancel();
+                timer.cancel(); // stop timer
             } else{
-                timer = (Timer)msg.obj;
+                timer = (Timer)msg.obj; // store timer
                 if (null != tv_duration_value && null != tv_quantity_value) {
-                    float speed = (float) 1.0;
+                    float speed = (float) 0.27; // speed of pump 100L per hour equals to 0.27 dl per seconds approximately
                     tv_duration_value.setText((String) msg.getData().getString("timeFormat"));
-                    tv_quantity_value.setText(String.valueOf(((Integer) msg.getData().getInt("time")) * speed ) + "ml");
+                    if (msg.getData().getInt("time") > 1 ){
+                        tv_quantity_value.setText(String.valueOf(((Integer) msg.getData().getInt("time")-1) * speed ) + "dl");
+                    }
                 }
             }
         }

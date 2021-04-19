@@ -1,309 +1,287 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/ic_autorenew"
-        android:layout_marginStart="@dimen/card_margin_LeftRight"
-        android:layout_marginEnd="@dimen/card_margin_LeftRight"
-        android:layout_above="@+id/ll_environmentData"/>
+    tools:context=".MainActivity"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
 
     <LinearLayout
-        android:id="@+id/ll_environmentData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/White"
-        android:layout_above="@+id/ll_irrigation"
-        android:layout_margin="10dp"
-        android:elevation="1dp">
+        android:orientation="vertical">
 
-        <RelativeLayout
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="393dp"
+            android:layout_above="@+id/ll_environmentData"
+            android:layout_marginStart="@dimen/card_margin_LeftRight"
+            android:layout_marginEnd="@dimen/card_margin_LeftRight"
+            android:src="@drawable/background" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:text="Name"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <TextView
-                android:id="@+id/tv_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:text="value"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <ImageButton
-                android:id="@+id/bt_refresh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/None"
-                android:src="@drawable/ic_autorenew"
-                android:layout_toLeftOf="@+id/tv_value"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="16dp"/>
-
-        </RelativeLayout>
-
-        <View
+        <LinearLayout
+            android:id="@+id/ll_environmentData"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/DividerDark"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/White"
+            android:layout_above="@+id/ll_irrigation"
+            android:layout_margin="10dp"
+            android:elevation="1dp">
 
-        <RelativeLayout
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_marginLeft="@dimen/item_margin_LeftRight"
+                    android:text="Name"
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+                <TextView
+                    android:id="@+id/tv_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/item_margin_LeftRight"
+                    android:text="value"
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+                <ImageButton
+                    android:id="@+id/bt_refresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/None"
+                    android:src="@drawable/ic_autorenew"
+                    android:layout_toLeftOf="@+id/tv_value"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="16dp"/>
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/DividerDark"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_humidity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_marginLeft="@dimen/item_margin_LeftRight"
+                    android:text="Air humidity："
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+                <TextView
+                    android:id="@+id/tv_humidity_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/item_margin_LeftRight"
+                    android:text="100"
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_temperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_marginLeft="@dimen/item_margin_LeftRight"
+                    android:text="Temperature："
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+                <TextView
+                    android:id="@+id/tv_temperature_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/item_margin_LeftRight"
+                    android:text="100"
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_light"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_marginLeft="@dimen/item_margin_LeftRight"
+                    android:text="Light intensity："
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+                <TextView
+                    android:id="@+id/tv_light_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/item_margin_LeftRight"
+                    android:text="100"
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_moisture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_marginLeft="@dimen/item_margin_LeftRight"
+                    android:text="Soil moisture："
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+                <TextView
+                    android:id="@+id/tv_moisture_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/item_margin_LeftRight"
+                    android:text="100"
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_irrigation"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:background="@color/White"
+            android:layout_margin="10dp"
+            android:elevation="1dp">
 
-            <TextView
-                android:id="@+id/tv_humidity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:text="Air humidity："
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tv_humidity_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:text="100"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
+                <TextView
+                    android:id="@+id/tv_manual_irrigation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_marginLeft="@dimen/item_margin_LeftRight"
+                    android:text="Manual irrigation"
+                    android:textSize="20dp"
+                    android:textColor="@color/Black"/>
 
-        </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tv_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/item_margin_LeftRight"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_below="@id/tv_manual_irrigation"
+                    android:text="Duration : "
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
 
-            <TextView
-                android:id="@+id/tv_temperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:text="Temperature："
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
+                <TextView
+                    android:id="@+id/tv_duration_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@id/bt_water"
+                    android:layout_marginRight="@dimen/item_margin_LeftRight"
+                    android:layout_alignBaseline="@+id/tv_duration"
+                    android:text="10 s"
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
 
-            <TextView
-                android:id="@+id/tv_temperature_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:text="100"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
+                <TextView
+                    android:id="@+id/tv_quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/item_margin_LeftRight"
+                    android:layout_marginTop="@dimen/item_margin_TopBottom"
+                    android:layout_marginBottom="@dimen/item_margin_TopBottom"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/tv_duration"
+                    android:text="Quantity : "
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/tv_quantity_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@id/bt_water"
+                    android:layout_marginRight="@dimen/item_margin_LeftRight"
+                    android:layout_alignBaseline="@+id/tv_quantity"
+                    android:text="10 ml"
+                    android:textSize="@dimen/normal_text_size"
+                    android:textColor="@color/Black"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/bt_water"
+                    android:layout_width="133dp"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:text="Water!"
+                    android:textSize="20dp"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_alignBottom="@+id/tv_quantity" />
 
-            <TextView
-                android:id="@+id/tv_light"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:text="Light intensity："
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
+            </RelativeLayout>
 
-            <TextView
-                android:id="@+id/tv_light_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:text="100"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
+        </LinearLayout>
 
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tv_moisture"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:text="Soil moisture："
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <TextView
-                android:id="@+id/tv_moisture_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:text="100"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-        </RelativeLayout>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_irrigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:background="@color/White"
-        android:layout_margin="10dp"
-        android:elevation="1dp">
+</ScrollView>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tv_auto_irrigation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:text="Automatic irrigation"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <Switch
-                android:id="@+id/sw_auto_irrigation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"/>
-
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/DividerDark"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tv_manual_irrigation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:text="Manual irrigation"
-                android:textSize="20dp"
-                android:textColor="@color/Black"/>
-
-
-            <TextView
-                android:id="@+id/tv_duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_below="@id/tv_manual_irrigation"
-                android:text="Duration : "
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <TextView
-                android:id="@+id/tv_duration_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/bt_water"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:layout_alignBaseline="@+id/tv_duration"
-                android:text="10 s"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <TextView
-                android:id="@+id/tv_quantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/item_margin_LeftRight"
-                android:layout_marginTop="@dimen/item_margin_TopBottom"
-                android:layout_marginBottom="@dimen/item_margin_TopBottom"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/tv_duration"
-                android:text="Quantity : "
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <TextView
-                android:id="@+id/tv_quantity_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/bt_water"
-                android:layout_marginRight="@dimen/item_margin_LeftRight"
-                android:layout_alignBaseline="@+id/tv_quantity"
-                android:text="10 ml"
-                android:textSize="@dimen/normal_text_size"
-                android:textColor="@color/Black"/>
-
-            <Button
-                android:id="@+id/bt_water"
-                android:layout_width="133dp"
-                android:layout_height="wrap_content"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:text="Water!"
-                android:textSize="20dp"
-                android:paddingStart="30dp"
-                android:paddingEnd="30dp"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="20dp"
-                android:layout_alignBottom="@+id/tv_quantity" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-
-</RelativeLayout>
