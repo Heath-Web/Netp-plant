@@ -118,6 +118,7 @@ char* generate_response(char recv_buf[], char data[]){
 	static char send_buf[1024];
 	printf("rf:%s\n",recv_buf);
 	printf("%d\n",strcmp(recv_buf ,"open pump"));
+	int i=0;
 	// Judge the command
 	if (strcmp(recv_buf ,"get enviroment\0")==1){
 		// "get enviroment" command 
@@ -130,8 +131,8 @@ char* generate_response(char recv_buf[], char data[]){
 		//get humidity adnd temperature
 		read_dht11_data(data); // pre load
 		int code = read_dht11_data(data);
-		float moisture=0;
-		float light = 0;
+		int moisture=0;
+		int light = 0;
 		printf("code:%d\n",code);
 		switch(code){
 			case 3:
@@ -140,13 +141,16 @@ char* generate_response(char recv_buf[], char data[]){
 				printf("temperature:%d\n",data[2]);
 				// get moisture
 				ad(0x00);
-				moisture = float(255-ad(0x00))/(float)255; //range 0-1
-				printf("moisture:%.2f\n",moisture);
+				moisture = (255-ad(0x00))*100/255; //range 0-1
+				//moisture = ad(0x00);
+				printf("moisture:0.%d\n",moisture);
+				//printf("mositure:%d\n",moisture);
 				// light
 				ad(0x02);
-				light = (float)(255-ad(0x02))/(float)255;
-				printf("light:%.2f\n",light);
-	
+				light = (255-ad(0x02))*100/255;
+				//light = ad(0x02);
+				printf("light:0.%d\n",light);
+				//printf("light:%d\n",light);
 				//Converts integers to string
 				sprintf(humidity_str,"%d",data[0]); 
 				sprintf(temperature_str,"%d",data[2]); 
@@ -162,7 +166,7 @@ char* generate_response(char recv_buf[], char data[]){
 				strcat(send_buf,moisture_str); 
 				strcat(send_buf,",\'light\':");
 				strcat(send_buf,light_str);
-				strcat(send_buf,"}");
+				strcat(send_buf,"};");
 				//strcpy(send_buf,"{\'status\':1,\'humidity\':12.0,\'temperature\':13.0,\'moisture\':1.0,\'light\':45}");
 				break;
 			
@@ -174,25 +178,26 @@ char* generate_response(char recv_buf[], char data[]){
 				// something wrong when getting humidity and temperature
 				printf("get enviroment data failed\n");
 				// send buffer status code = -1
-				strcpy(send_buf,"{\'status\':-1}");
+				strcpy(send_buf,"{\'status\':-1};");
 				break;		
 		}
 	}else if (strcmp(recv_buf ,"open pump")==0){
 		//open pump command
 		printf("#command: open pump \n");
 		//open pump
-		relay();
+		relay(i);
 		//response status code=1
-		strcpy(send_buf,"{\'status\':1}");
-	}else if (strcmp(recv_buf ,"close pump")==1){
+		strcpy(send_buf,"{\'status\':1};");
+	}else if (strcmp(recv_buf ,"close pump")==0){
 		//close pump command
 		printf("#command: close pump \n");
 		//close pump
+		relay(~i);
 		//response status code=1
-		strcpy(send_buf,"{\'status\':1}");
+		strcpy(send_buf,"{\'status\':1};");
 	}else {
 		printf("#command does not exist: %s \n", recv_buf);
-		strcpy(send_buf,"{\'status\':-1}");
+		strcpy(send_buf,"{\'status\':-1};");
 	}
 	// return send buffer
 	return send_buf;

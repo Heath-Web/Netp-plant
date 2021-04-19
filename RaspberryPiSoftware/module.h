@@ -1,7 +1,7 @@
 #ifndef MODULE_H
 #define MODULE_H
 
-void relay(void);
+void relay(int i);
 int ad(int add);
 
 #endif

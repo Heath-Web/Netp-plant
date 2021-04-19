@@ -6,10 +6,12 @@
 #include <wiringPi.h>
 #include <sys/time.h>
 #include <wiringPiI2C.h>
+#include <string.h>
 using namespace std;
 #define ad_address 0x48
 #define relay_gpio 0
 #define DAT 2
+
 
 //Write
 void write(int data){
@@ -39,14 +41,11 @@ void write(int data){
 //Acknowledge
 void ack(void){
 	
-	cout << digitalRead(8) << endl;
 	pinMode(8,INPUT);
 	pullUpDnControl(8,PUD_UP); 
-	cout << digitalRead(8) << endl;
 	while(digitalRead(8) == 1);
 	digitalWrite(9,HIGH);
 	usleep(5);
-	cout << digitalRead(8) << endl;
 	digitalWrite(9,LOW);
 	pinMode(8,OUTPUT);
 	digitalWrite(8,HIGH);
@@ -146,12 +145,16 @@ int ad(int add){
 }
 
 //Open bump 5 sec
-void relay(void){
+void relay(int i){
 
+	int opt;
+	if (i==0){
+		 opt=0;
+		}else{
+		opt=1;
+		}
 	pinMode(relay_gpio, OUTPUT);
-	digitalWrite(relay_gpio, LOW);
-	sleep(5);
-	digitalWrite(relay_gpio, HIGH);
+	digitalWrite(relay_gpio, opt);
 
 }
 
