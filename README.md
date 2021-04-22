@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Net+ Plant
 
 Auto irrigation through Raspberry Pi and monitor environment data of home plants .
@@ -14,7 +15,7 @@ Auto irrigation through Raspberry Pi and monitor environment data of home plants
 
 The aim of this project is to design and fabricate a prototype auto irrigation system for home plants. Users can monitor the environment data like air humidity and temperature soil moisture and light intensity.  It also have a water pump button to start or stop the water flow. in addition, the irrigation time and the yield of water is available to show in the interface.  
 
-### Required hardware
+#### Required hardware
 
 Raspberry Pi 4b  
 DHT11 Temperature and humidity sensor  
@@ -39,7 +40,7 @@ the demonstration video is here [Demonstration Vidio](https://youtu.be/O6kg-7maI
 
 #### File Structure
 
-The repository consists of 3 folders:
+The repository consists of 4 folders:
 
 - Android GUI 
 
@@ -110,4 +111,3 @@ In order to download, install and use Graphical User Interface *Net+ Plant* APP 
 5. Open/Close water Pump 
 
    <img src="https://github.com/paymorepatience/Netp-plant/blob/main/Media/Images/Android_interface2.png">
-
